@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16
+    container_name: odoo_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+
+  odoo17:
+    image: odoo:17.0
+    container_name: odoo_app
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+    command: >
+      odoo -d odoo_db
+       -u tp_gestion_projets --dev=xml 
+       --db_user=odoo 
+       --db_password=odoo 
+       --db_host=db
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
